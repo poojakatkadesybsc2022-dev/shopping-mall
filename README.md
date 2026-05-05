@@ -16,7 +16,7 @@ This project uses Machine Learning (KMeans Clustering) to segment mall customers
 - Visualize customer segments
 
 ## Live Demo
-[Paste your Streamlit link here]
+https://shopping-mall-fsp63pvue3qgzzw7qt9idn.streamlit.app
 
 ## Author
 Pooja Katkade
