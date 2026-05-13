@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans, DBSCAN
 from sklearn.decomposition import PCA
@@ -31,14 +30,11 @@ if file:
 
     df = pd.read_csv(file)
 
-    # REMOVE EXTRA SPACES
     df.columns = df.columns.str.strip()
 
-    # SHOW COLUMN NAMES
     st.subheader("📌 Dataset Columns")
     st.write(df.columns)
 
-    # SHOW DATA
     st.subheader("📊 Raw Dataset")
     st.write(df.head())
 
@@ -115,6 +111,22 @@ if file:
     )
 
     st.pyplot(fig2)
+
+    # =========================================
+    # OUTLIER COUNT
+    # =========================================
+
+    outliers = df[df['DBSCAN_Cluster'] == -1]
+
+    num_outliers = len(outliers)
+
+    st.subheader("🚨 Outlier Detection Summary")
+
+    st.write(f"Number of Outliers Detected: {num_outliers}")
+
+    st.write("Outlier Customers")
+
+    st.write(outliers)
 
     st.info("""
     DBSCAN helps detect:
