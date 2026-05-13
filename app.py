@@ -18,7 +18,7 @@ from sklearn.model_selection import train_test_split
 st.title("🧠 AI Customer Intelligence System")
 
 # =========================================
-# FILE UPLOAD
+# FILE UPLOADER
 # =========================================
 
 file = st.file_uploader("Upload Customer CSV File", type=["csv"])
@@ -31,6 +31,14 @@ if file:
 
     df = pd.read_csv(file)
 
+    # REMOVE EXTRA SPACES
+    df.columns = df.columns.str.strip()
+
+    # SHOW COLUMN NAMES
+    st.subheader("📌 Dataset Columns")
+    st.write(df.columns)
+
+    # SHOW DATA
     st.subheader("📊 Raw Dataset")
     st.write(df.head())
 
@@ -38,7 +46,7 @@ if file:
     # FEATURE SELECTION
     # =========================================
 
-    features = df[['Age', 'Annual_Income_k$', 'Spending_Score']]
+    features = df[['Age', 'Annual Income', 'Spending Score']]
 
     # =========================================
     # FEATURE SCALING
@@ -52,17 +60,24 @@ if file:
     # KMEANS CLUSTERING
     # =========================================
 
-    kmeans = KMeans(n_clusters=5, random_state=42)
+    kmeans = KMeans(
+        n_clusters=5,
+        random_state=42
+    )
 
     df['Cluster'] = kmeans.fit_predict(scaled_data)
+
+    # =========================================
+    # KMEANS VISUALIZATION
+    # =========================================
 
     st.subheader("🎯 KMeans Customer Segmentation")
 
     fig1, ax1 = plt.subplots()
 
     sns.scatterplot(
-        x='Annual_Income_k$',
-        y='Spending_Score',
+        x='Annual Income',
+        y='Spending Score',
         hue='Cluster',
         palette='Set1',
         data=df,
@@ -75,17 +90,24 @@ if file:
     # DBSCAN CLUSTERING
     # =========================================
 
-    dbscan = DBSCAN(eps=0.8, min_samples=5)
+    dbscan = DBSCAN(
+        eps=0.8,
+        min_samples=5
+    )
 
     df['DBSCAN_Cluster'] = dbscan.fit_predict(scaled_data)
+
+    # =========================================
+    # DBSCAN VISUALIZATION
+    # =========================================
 
     st.subheader("🔍 DBSCAN Outlier Detection")
 
     fig2, ax2 = plt.subplots()
 
     sns.scatterplot(
-        x='Annual_Income_k$',
-        y='Spending_Score',
+        x='Annual Income',
+        y='Spending Score',
         hue='DBSCAN_Cluster',
         palette='Set2',
         data=df,
@@ -95,10 +117,10 @@ if file:
     st.pyplot(fig2)
 
     st.info("""
-    DBSCAN detects:
-    - abnormal customers
-    - rare spending behavior
-    - outliers
+    DBSCAN helps detect:
+    - Outliers
+    - Rare customers
+    - Abnormal spending behavior
     """)
 
     # =========================================
@@ -191,7 +213,7 @@ if file:
     st.text(report)
 
     st.success("""
-    SVM predicts whether a customer is:
+    SVM predicts whether customer is:
     - Premium Customer
     - Normal Customer
     """)
@@ -203,7 +225,7 @@ if file:
     st.subheader("📌 Cluster Summary")
 
     summary = df.groupby('Cluster')[
-        ['Age', 'Annual_Income_k$', 'Spending_Score']
+        ['Age', 'Annual Income', 'Spending Score']
     ].mean()
 
     st.write(summary)
@@ -215,15 +237,17 @@ if file:
     st.subheader("💡 Business Insights")
 
     st.markdown("""
+    ### Algorithms Used
+
+    ✅ KMeans → Customer Segmentation  
+    ✅ DBSCAN → Outlier Detection  
+    ✅ SVM → Customer Prediction  
+
+    ### Customer Insights
+
     - Cluster 0 → Premium Customers  
     - Cluster 1 → Low Value Customers  
     - Cluster 2 → Average Customers  
     - Cluster 3 → Young High Spenders  
     - Cluster 4 → Target Customers  
-
-    ### Algorithms Used
-
-    ✅ KMeans → Customer Segmentation  
-    ✅ DBSCAN → Outlier Detection  
-    ✅ SVM → Customer Type Prediction  
     """)
