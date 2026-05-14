@@ -1,260 +1,198 @@
 # =========================================
-# AI SMART CHATBOT
+# CHATBOT
 # =========================================
 
-st.subheader("🤖 AI Smart Dataset Chatbot")
+try:
 
-user_question = st.text_input(
-    "Ask questions about your dataset/project:"
-)
+    st.subheader("🤖 AI Smart Dataset Chatbot")
 
-if user_question:
+    user_question = st.text_input(
+        "Ask questions about your dataset/project:"
+    )
 
-    question = user_question.lower()
+    if user_question:
 
-    # =========================================
-    # BASIC DATASET INFO
-    # =========================================
+        question = user_question.lower()
 
-    if "rows" in question or "records" in question:
+        # =========================================
+        # ROWS
+        # =========================================
 
-        st.success(f"""
-        Total Rows in Dataset:
-        {df.shape[0]}
-        """)
+        if "rows" in question:
 
-    elif "columns" in question:
+            st.success(f"Total Rows: {df.shape[0]}")
 
-        st.success(f"""
-        Total Columns in Dataset:
-        {df.shape[1]}
+        # =========================================
+        # COLUMNS
+        # =========================================
 
-        Column Names:
-        {list(df.columns)}
-        """)
+        elif "columns" in question:
 
-    elif "shape" in question:
+            st.success(f"Total Columns: {df.shape[1]}")
 
-        st.success(f"""
-        Dataset Shape:
-        {df.shape}
-        """)
+            st.write(list(df.columns))
 
-    elif "null" in question or "missing" in question:
+        # =========================================
+        # NULL VALUES
+        # =========================================
 
-        null_values = df.isnull().sum()
+        elif "null" in question or "missing" in question:
 
-        st.success("Null Values In Dataset")
+            st.success("Null Values")
 
-        st.write(null_values)
+            st.write(df.isnull().sum())
 
-    elif "duplicate" in question:
+        # =========================================
+        # DUPLICATES
+        # =========================================
 
-        duplicates = df.duplicated().sum()
+        elif "duplicate" in question:
 
-        st.success(f"""
-        Total Duplicate Rows:
-        {duplicates}
-        """)
+            duplicates = df.duplicated().sum()
 
-    # =========================================
-    # OUTLIERS
-    # =========================================
+            st.success(f"Duplicate Rows: {duplicates}")
 
-    elif "outlier" in question:
+        # =========================================
+        # OUTLIERS
+        # =========================================
 
-        st.success(f"""
-        Total Outliers Detected:
-        {num_outliers}
+        elif "outlier" in question:
 
-        DBSCAN detected unusual customers
-        with abnormal spending behavior.
-        """)
+            st.success(f"Total Outliers: {num_outliers}")
 
-        st.write(outliers)
+            st.write(outliers)
 
-    # =========================================
-    # STATISTICS
-    # =========================================
+        # =========================================
+        # SHAPE
+        # =========================================
 
-    elif "statistics" in question or "summary" in question:
+        elif "shape" in question:
 
-        st.success("Dataset Statistical Summary")
+            st.success(f"Dataset Shape: {df.shape}")
 
-        st.write(df.describe())
+        # =========================================
+        # STATISTICS
+        # =========================================
 
-    elif "average income" in question:
+        elif "statistics" in question or "summary" in question:
 
-        avg_income = df['Annual Income'].mean()
+            st.write(df.describe())
 
-        st.success(f"""
-        Average Annual Income:
-        {avg_income:.2f}
-        """)
+        # =========================================
+        # AGE
+        # =========================================
 
-    elif "highest spending" in question:
+        elif "age" in question:
 
-        highest = df['Spending Score'].max()
+            st.write(df['Age'].describe())
 
-        st.success(f"""
-        Highest Spending Score:
-        {highest}
-        """)
+        # =========================================
+        # INCOME
+        # =========================================
 
-    elif "lowest spending" in question:
+        elif "income" in question:
 
-        lowest = df['Spending Score'].min()
+            st.write(df['Annual Income'].describe())
 
-        st.success(f"""
-        Lowest Spending Score:
-        {lowest}
-        """)
+        # =========================================
+        # SPENDING SCORE
+        # =========================================
 
-    elif "average age" in question:
+        elif "spending" in question:
 
-        avg_age = df['Age'].mean()
+            st.write(df['Spending Score'].describe())
 
-        st.success(f"""
-        Average Customer Age:
-        {avg_age:.2f}
-        """)
+        # =========================================
+        # CLUSTERS
+        # =========================================
 
-    # =========================================
-    # CLUSTER QUESTIONS
-    # =========================================
+        elif "cluster" in question:
 
-    elif "cluster" in question:
+            st.success("""
+            Cluster 0 → Premium Customers
+            Cluster 1 → Low Value Customers
+            Cluster 2 → Average Customers
+            Cluster 3 → Young High Spenders
+            Cluster 4 → Target Customers
+            """)
 
-        st.success("""
-        Cluster Insights:
+            st.write(df['Cluster'].value_counts())
 
-        Cluster 0 → Premium Customers
-        Cluster 1 → Low Value Customers
-        Cluster 2 → Average Customers
-        Cluster 3 → Young High Spenders
-        Cluster 4 → Target Customers
-        """)
+        # =========================================
+        # KMEANS
+        # =========================================
 
-        cluster_count = df['Cluster'].value_counts()
+        elif "kmeans" in question:
 
-        st.write(cluster_count)
+            st.success("""
+            KMeans is used for customer segmentation.
+            """)
 
-    elif "premium customers" in question:
+        # =========================================
+        # DBSCAN
+        # =========================================
 
-        premium = df[df['Customer_Type'] == 1]
+        elif "dbscan" in question:
 
-        st.success(f"""
-        Total Premium Customers:
-        {len(premium)}
-        """)
+            st.success("""
+            DBSCAN is used for outlier detection.
+            """)
 
-        st.write(premium.head())
+        # =========================================
+        # PCA
+        # =========================================
 
-    # =========================================
-    # ML ALGORITHMS
-    # =========================================
+        elif "pca" in question:
 
-    elif "kmeans" in question:
+            st.success("""
+            PCA reduces dimensions for visualization.
+            """)
 
-        st.success("""
-        KMeans Clustering Algorithm:
+        # =========================================
+        # SVM
+        # =========================================
 
-        - Type → Unsupervised ML
-        - Purpose → Customer Segmentation
-        - Clusters Created → 5
-        """)
+        elif "svm" in question:
 
-    elif "dbscan" in question:
+            st.success("""
+            SVM predicts customer category.
+            """)
 
-        st.success("""
-        DBSCAN Algorithm:
+        # =========================================
+        # ALGORITHMS
+        # =========================================
 
-        - Type → Density Based Clustering
-        - Purpose → Outlier Detection
-        - Detects abnormal customer behavior
-        """)
+        elif "algorithms" in question:
 
-    elif "svm" in question:
+            st.success("""
+            Algorithms Used:
 
-        st.success("""
-        SVM Algorithm:
+            ✅ KMeans
+            ✅ DBSCAN
+            ✅ PCA
+            ✅ SVM
+            """)
 
-        - Type → Supervised ML
-        - Kernel Used → RBF
-        - Purpose → Customer Prediction
-        """)
+        # =========================================
+        # DEFAULT
+        # =========================================
 
-    elif "pca" in question:
+        else:
 
-        st.success("""
-        PCA reduces dimensions for visualization.
+            st.warning("""
+            Ask questions like:
 
-        It converts multiple features into
-        2D graphs for easier understanding.
-        """)
+            - Total rows
+            - Null values
+            - Outliers
+            - KMeans
+            - DBSCAN
+            - SVM
+            - PCA
+            - Cluster info
+            - Statistics
+            """)
 
-    elif "silhouette" in question:
+except Exception as e:
 
-        st.success(f"""
-        Silhouette Score:
-        {score:.2f}
-
-        Higher score means better clustering.
-        """)
-
-    elif "algorithms" in question:
-
-        st.success("""
-        Algorithms Used:
-
-        ✅ KMeans
-        ✅ DBSCAN
-        ✅ PCA
-        ✅ SVM
-        """)
-
-    # =========================================
-    # COLUMN SPECIFIC QUESTIONS
-    # =========================================
-
-    elif "age" in question:
-
-        st.success("Age Column Information")
-
-        st.write(df['Age'].describe())
-
-    elif "income" in question:
-
-        st.success("Annual Income Information")
-
-        st.write(df['Annual Income'].describe())
-
-    elif "spending" in question:
-
-        st.success("Spending Score Information")
-
-        st.write(df['Spending Score'].describe())
-
-    # =========================================
-    # DEFAULT RESPONSE
-    # =========================================
-
-    else:
-
-        st.warning("""
-        I can answer questions related to:
-
-        ✅ Dataset
-        ✅ Null Values
-        ✅ Outliers
-        ✅ KMeans
-        ✅ DBSCAN
-        ✅ PCA
-        ✅ SVM
-        ✅ Statistics
-        ✅ Clusters
-        ✅ Spending Score
-        ✅ Income
-        ✅ Age
-        ✅ Premium Customers
-        """)
+    st.error("Chatbot could not load properly.")
