@@ -1,265 +1,260 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans, DBSCAN
-from sklearn.decomposition import PCA
-from sklearn.metrics import silhouette_score, classification_report
-from sklearn.svm import SVC
-from sklearn.model_selection import train_test_split
-
 # =========================================
-# TITLE
+# AI SMART CHATBOT
 # =========================================
 
-st.title("🧠 AI Customer Intelligence System")
+st.subheader("🤖 AI Smart Dataset Chatbot")
 
-# =========================================
-# FILE UPLOADER
-# =========================================
+user_question = st.text_input(
+    "Ask questions about your dataset/project:"
+)
 
-file = st.file_uploader("Upload Customer CSV File", type=["csv"])
+if user_question:
 
-if file:
-
-    # =========================================
-    # LOAD DATA
-    # =========================================
-
-    df = pd.read_csv(file)
-
-    df.columns = df.columns.str.strip()
-
-    st.subheader("📌 Dataset Columns")
-    st.write(df.columns)
-
-    st.subheader("📊 Raw Dataset")
-    st.write(df.head())
+    question = user_question.lower()
 
     # =========================================
-    # FEATURE SELECTION
+    # BASIC DATASET INFO
     # =========================================
 
-    features = df[['Age', 'Annual Income', 'Spending Score']]
+    if "rows" in question or "records" in question:
+
+        st.success(f"""
+        Total Rows in Dataset:
+        {df.shape[0]}
+        """)
+
+    elif "columns" in question:
+
+        st.success(f"""
+        Total Columns in Dataset:
+        {df.shape[1]}
+
+        Column Names:
+        {list(df.columns)}
+        """)
+
+    elif "shape" in question:
+
+        st.success(f"""
+        Dataset Shape:
+        {df.shape}
+        """)
+
+    elif "null" in question or "missing" in question:
+
+        null_values = df.isnull().sum()
+
+        st.success("Null Values In Dataset")
+
+        st.write(null_values)
+
+    elif "duplicate" in question:
+
+        duplicates = df.duplicated().sum()
+
+        st.success(f"""
+        Total Duplicate Rows:
+        {duplicates}
+        """)
 
     # =========================================
-    # FEATURE SCALING
+    # OUTLIERS
     # =========================================
 
-    scaler = StandardScaler()
+    elif "outlier" in question:
 
-    scaled_data = scaler.fit_transform(features)
+        st.success(f"""
+        Total Outliers Detected:
+        {num_outliers}
 
-    # =========================================
-    # KMEANS CLUSTERING
-    # =========================================
+        DBSCAN detected unusual customers
+        with abnormal spending behavior.
+        """)
 
-    kmeans = KMeans(
-        n_clusters=5,
-        random_state=42
-    )
-
-    df['Cluster'] = kmeans.fit_predict(scaled_data)
+        st.write(outliers)
 
     # =========================================
-    # KMEANS VISUALIZATION
+    # STATISTICS
     # =========================================
 
-    st.subheader("🎯 KMeans Customer Segmentation")
+    elif "statistics" in question or "summary" in question:
 
-    fig1, ax1 = plt.subplots()
+        st.success("Dataset Statistical Summary")
 
-    sns.scatterplot(
-        x='Annual Income',
-        y='Spending Score',
-        hue='Cluster',
-        palette='Set1',
-        data=df,
-        ax=ax1
-    )
+        st.write(df.describe())
 
-    st.pyplot(fig1)
+    elif "average income" in question:
 
-    # =========================================
-    # DBSCAN CLUSTERING
-    # =========================================
+        avg_income = df['Annual Income'].mean()
 
-    dbscan = DBSCAN(
-        eps=0.8,
-        min_samples=5
-    )
+        st.success(f"""
+        Average Annual Income:
+        {avg_income:.2f}
+        """)
 
-    df['DBSCAN_Cluster'] = dbscan.fit_predict(scaled_data)
+    elif "highest spending" in question:
 
-    # =========================================
-    # DBSCAN VISUALIZATION
-    # =========================================
+        highest = df['Spending Score'].max()
 
-    st.subheader("🔍 DBSCAN Outlier Detection")
+        st.success(f"""
+        Highest Spending Score:
+        {highest}
+        """)
 
-    fig2, ax2 = plt.subplots()
+    elif "lowest spending" in question:
 
-    sns.scatterplot(
-        x='Annual Income',
-        y='Spending Score',
-        hue='DBSCAN_Cluster',
-        palette='Set2',
-        data=df,
-        ax=ax2
-    )
+        lowest = df['Spending Score'].min()
 
-    st.pyplot(fig2)
+        st.success(f"""
+        Lowest Spending Score:
+        {lowest}
+        """)
+
+    elif "average age" in question:
+
+        avg_age = df['Age'].mean()
+
+        st.success(f"""
+        Average Customer Age:
+        {avg_age:.2f}
+        """)
 
     # =========================================
-    # OUTLIER COUNT
+    # CLUSTER QUESTIONS
     # =========================================
 
-    outliers = df[df['DBSCAN_Cluster'] == -1]
+    elif "cluster" in question:
 
-    num_outliers = len(outliers)
+        st.success("""
+        Cluster Insights:
 
-    st.subheader("🚨 Outlier Detection Summary")
+        Cluster 0 → Premium Customers
+        Cluster 1 → Low Value Customers
+        Cluster 2 → Average Customers
+        Cluster 3 → Young High Spenders
+        Cluster 4 → Target Customers
+        """)
 
-    st.write(f"Number of Outliers Detected: {num_outliers}")
+        cluster_count = df['Cluster'].value_counts()
 
-    st.write("Outlier Customers")
+        st.write(cluster_count)
 
-    st.write(outliers)
+    elif "premium customers" in question:
 
-    st.info("""
-    DBSCAN helps detect:
-    - Outliers
-    - Rare customers
-    - Abnormal spending behavior
-    """)
+        premium = df[df['Customer_Type'] == 1]
 
-    # =========================================
-    # PCA VISUALIZATION
-    # =========================================
+        st.success(f"""
+        Total Premium Customers:
+        {len(premium)}
+        """)
 
-    pca = PCA(n_components=2)
-
-    pca_data = pca.fit_transform(scaled_data)
-
-    pca_df = pd.DataFrame(
-        pca_data,
-        columns=['PC1', 'PC2']
-    )
-
-    pca_df['Cluster'] = df['Cluster']
-
-    st.subheader("📉 PCA Visualization")
-
-    fig3, ax3 = plt.subplots()
-
-    sns.scatterplot(
-        x='PC1',
-        y='PC2',
-        hue='Cluster',
-        palette='viridis',
-        data=pca_df,
-        ax=ax3
-    )
-
-    st.pyplot(fig3)
+        st.write(premium.head())
 
     # =========================================
-    # SILHOUETTE SCORE
+    # ML ALGORITHMS
     # =========================================
 
-    score = silhouette_score(
-        scaled_data,
-        df['Cluster']
-    )
+    elif "kmeans" in question:
 
-    st.subheader("📊 KMeans Evaluation")
+        st.success("""
+        KMeans Clustering Algorithm:
 
-    st.write(f"Silhouette Score: {score:.2f}")
+        - Type → Unsupervised ML
+        - Purpose → Customer Segmentation
+        - Clusters Created → 5
+        """)
 
-    # =========================================
-    # CREATE LABELS FOR SVM
-    # =========================================
+    elif "dbscan" in question:
 
-    df['Customer_Type'] = df['Cluster'].apply(
-        lambda x: 1 if x in [0, 3] else 0
-    )
+        st.success("""
+        DBSCAN Algorithm:
 
-    # =========================================
-    # TRAIN TEST SPLIT
-    # =========================================
+        - Type → Density Based Clustering
+        - Purpose → Outlier Detection
+        - Detects abnormal customer behavior
+        """)
 
-    X = scaled_data
+    elif "svm" in question:
 
-    y = df['Customer_Type']
+        st.success("""
+        SVM Algorithm:
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=0.2,
-        random_state=42
-    )
+        - Type → Supervised ML
+        - Kernel Used → RBF
+        - Purpose → Customer Prediction
+        """)
 
-    # =========================================
-    # SVM MODEL
-    # =========================================
+    elif "pca" in question:
 
-    svm_model = SVC(kernel='rbf')
+        st.success("""
+        PCA reduces dimensions for visualization.
 
-    svm_model.fit(X_train, y_train)
+        It converts multiple features into
+        2D graphs for easier understanding.
+        """)
 
-    predictions = svm_model.predict(X_test)
+    elif "silhouette" in question:
 
-    # =========================================
-    # CLASSIFICATION REPORT
-    # =========================================
+        st.success(f"""
+        Silhouette Score:
+        {score:.2f}
 
-    st.subheader("🤖 SVM Classification Report")
+        Higher score means better clustering.
+        """)
 
-    report = classification_report(
-        y_test,
-        predictions
-    )
+    elif "algorithms" in question:
 
-    st.text(report)
+        st.success("""
+        Algorithms Used:
 
-    st.success("""
-    SVM predicts whether customer is:
-    - Premium Customer
-    - Normal Customer
-    """)
+        ✅ KMeans
+        ✅ DBSCAN
+        ✅ PCA
+        ✅ SVM
+        """)
 
     # =========================================
-    # CLUSTER SUMMARY
+    # COLUMN SPECIFIC QUESTIONS
     # =========================================
 
-    st.subheader("📌 Cluster Summary")
+    elif "age" in question:
 
-    summary = df.groupby('Cluster')[
-        ['Age', 'Annual Income', 'Spending Score']
-    ].mean()
+        st.success("Age Column Information")
 
-    st.write(summary)
+        st.write(df['Age'].describe())
+
+    elif "income" in question:
+
+        st.success("Annual Income Information")
+
+        st.write(df['Annual Income'].describe())
+
+    elif "spending" in question:
+
+        st.success("Spending Score Information")
+
+        st.write(df['Spending Score'].describe())
 
     # =========================================
-    # BUSINESS INSIGHTS
+    # DEFAULT RESPONSE
     # =========================================
 
-    st.subheader("💡 Business Insights")
+    else:
 
-    st.markdown("""
-    ### Algorithms Used
+        st.warning("""
+        I can answer questions related to:
 
-    ✅ KMeans → Customer Segmentation  
-    ✅ DBSCAN → Outlier Detection  
-    ✅ SVM → Customer Prediction  
-
-    ### Customer Insights
-
-    - Cluster 0 → Premium Customers  
-    - Cluster 1 → Low Value Customers  
-    - Cluster 2 → Average Customers  
-    - Cluster 3 → Young High Spenders  
-    - Cluster 4 → Target Customers  
-    """)
+        ✅ Dataset
+        ✅ Null Values
+        ✅ Outliers
+        ✅ KMeans
+        ✅ DBSCAN
+        ✅ PCA
+        ✅ SVM
+        ✅ Statistics
+        ✅ Clusters
+        ✅ Spending Score
+        ✅ Income
+        ✅ Age
+        ✅ Premium Customers
+        """)
